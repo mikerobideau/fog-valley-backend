@@ -6,9 +6,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.IntStream;
+import java.util.ArrayList;
 
 import static java.util.stream.Collectors.toList;
 
@@ -22,12 +28,12 @@ public class TranscriptService {
 
     public TranscriptService() {
         transcriptMap.put("secret", List.of("professor/abc", "allen/def"));
-        transcriptMap.put("secret2", List.of("professor/123", "allen/456"));
+        transcriptMap.put("secret2", List.of("professor/a123", "allen/a456"));
     }
 
     public TranscriptResponse findTranscripts(String keyword, String userId) {
         var savedGameTranscripts = savedGameService.getUnlockedTranscripts(userId);
-        var previousPaths = savedGameTranscripts.keySet();
+        var previousPaths = savedGameTranscripts.getMap().keySet();
         var previousTranscripts = getTranscriptsFromPaths(previousPaths.stream().collect(toList()));
         var newPaths = getNewPaths(keyword, previousPaths);
         var newTranscripts = getTranscriptsFromPaths(newPaths);
@@ -52,10 +58,15 @@ public class TranscriptService {
     }
 
     private List<String> getNewPaths(String keyword, Set<String> unlockedTitles) {
-        return transcriptMap.get(keyword)
-            .stream()
-            .filter(path -> !unlockedTitles.contains(path))
-            .collect(toList());
+        var matches = transcriptMap.get(keyword);
+        if (matches != null) {
+            return transcriptMap.get(keyword)
+                .stream()
+                .filter(path -> !unlockedTitles.contains(path))
+                .collect(toList());
+        } else {
+            return List.of();
+        }
     }
 
     private List<Transcript> getTranscriptsFromPaths(List<String> paths) {
@@ -68,6 +79,7 @@ public class TranscriptService {
                         .setTitle(data[1])
                         .setLines(getLines("transcripts/" + path + ".txt"));
                 } catch (IOException e) {
+                    e.printStackTrace();
                     return null;
                 }
             }).collect(toList());

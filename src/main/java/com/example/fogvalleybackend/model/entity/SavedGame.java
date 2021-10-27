@@ -1,9 +1,13 @@
 package com.example.fogvalleybackend.model.entity;
+import com.example.fogvalleybackend.converter.UnlockedTranscriptsConverter;
+import com.example.fogvalleybackend.model.UnlockedTranscripts;
 
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.Lob;
 import javax.persistence.Table;
+import javax.persistence.Lob;
+
 
 @Entity
 @Table(name = "SAVED_GAME")
@@ -11,8 +15,9 @@ public class SavedGame {
     @Id
     private String userId;
 
+    @Convert(converter = UnlockedTranscriptsConverter.class)
     @Lob
-    private String unlockedTranscripts;
+    private UnlockedTranscripts unlockedTranscripts;
 
     public SavedGame() {
 
@@ -27,11 +32,11 @@ public class SavedGame {
         return this;
     }
 
-    public String getUnlockedTranscripts() {
+    public UnlockedTranscripts getUnlockedTranscripts() {
         return unlockedTranscripts;
     }
 
-    public SavedGame setUnlockedTranscripts(String unlockedTranscripts) {
+    public SavedGame setUnlockedTranscripts(UnlockedTranscripts unlockedTranscripts) {
         this.unlockedTranscripts = unlockedTranscripts;
         return this;
     }
